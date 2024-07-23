@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "Screech",
+    "slug": "Screech",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/homeimage.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/homeimage.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/images/homeimage.png"
+    },
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
