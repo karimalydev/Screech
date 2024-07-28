@@ -17,6 +17,7 @@ interface Friend {
   username: string;
   bio: string;
   profilePicture: string;
+  highestLesson: number;
 }
 
 const FriendsScreen = () => {
@@ -53,12 +54,14 @@ const FriendsScreen = () => {
           const friendProfileDoc = await getDoc(doc(db, 'users', friendId));
           if (friendProfileDoc.exists()) {
             const friendProfile = friendProfileDoc.data();
+            const highestLesson = friendProfile.completedLessons ? Math.max(...friendProfile.completedLessons) : 0;
             friendsList.push({
               id: friendId,
               friendId: friendId,
               username: friendProfile.username,
               bio: friendProfile.bio || '',
               profilePicture: friendProfile.profilePicture || '',
+              highestLesson: highestLesson,
             });
           }
         }
@@ -151,7 +154,8 @@ const FriendsScreen = () => {
                 <Image source={item.profilePicture ? { uri: item.profilePicture } : require('../assets/images/homeimage.png')} style={styles.friendImage} />
                 <View style={styles.friendDetails}>
                   <Text style={styles.friendUsername}>{item.username}</Text>
-                  <Text style={styles.friendBio}>Status : {item.bio}</Text>
+                  <Text style={styles.friendBio}>Status: {item.bio}</Text>
+                  <Text style={styles.friendLesson}>Lesson Number: {item.highestLesson}</Text>
                 </View>
               </View>
             )}
@@ -276,6 +280,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
   },
+  friendLesson:{
+    fontSize: 14,
+    color: '#666',
+  }
 });
+
 
 export default FriendsScreen;

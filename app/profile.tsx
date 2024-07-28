@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
-import { auth, db } from '../firebaseConfig'; // Remove storage import
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { auth, db } from '../firebaseConfig';
+import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { FontAwesome } from '@expo/vector-icons';
 
 const ProfileScreen = () => {
@@ -48,6 +48,10 @@ const ProfileScreen = () => {
     router.push('/FriendsScreen');
   };
 
+  const handleAchievements = () => {
+    router.push('/AchievementsScreen');
+  };
+
   const handleUpdateBio = async () => {
     const user = auth.currentUser;
     if (user) {
@@ -56,6 +60,32 @@ const ProfileScreen = () => {
       setIsEditingBio(false);
       Alert.alert('Bio updated!');
     }
+  };
+
+  const handleDeactivate = async () => {
+    Alert.alert(
+      'Confirm Deactivation',
+      'Are you sure you want to deactivate your account? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'OK',
+          onPress: async () => {
+            const user = auth.currentUser;
+            if (user) {
+              try {
+                await deleteDoc(doc(db, 'users', user.uid));
+                await user.delete();
+                router.push('/');
+              } catch (error) {
+                Alert.alert('Error', 'There was an issue deactivating your account.');
+              }
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
   };
 
   return (
@@ -95,11 +125,12 @@ const ProfileScreen = () => {
       <TouchableOpacity style={styles.button} onPress={handleFriends}>
         <Text style={styles.buttonText}>FRIENDS</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>OVERVIEW</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button}>
+      
+      <TouchableOpacity style={styles.button} onPress={handleAchievements}>
         <Text style={styles.buttonText}>ACHIEVEMENTS</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={[styles.button, styles.deactivateButton]} onPress={handleDeactivate}>
+        <Text style={styles.buttonText}>DE-ACTIVATE</Text>
       </TouchableOpacity>
     </View>
   );
@@ -172,6 +203,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 10,
+  },
+  deactivateButton: {
+    backgroundColor: '#D3D3D3',
   },
   buttonText: {
     fontSize: 18,

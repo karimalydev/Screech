@@ -28,7 +28,15 @@ const RegisterScreen = () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      await setDoc(doc(db, 'users', user.uid), { username, email });
+      
+      // Initialize user data in Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        username,
+        email,
+        highestLesson: 1, // Initialize highestLesson to 1
+        completedLessons: [1] // Initialize completedLessons to [1]
+      });
+
       router.push('/login');
     } catch (error: any) {
       console.error('Registration error', error);

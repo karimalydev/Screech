@@ -1,13 +1,13 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { SplashScreen, Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { SplashScreen, Slot } from 'expo-router';
 import { useEffect } from 'react';
-import { initializeApp, getApps } from 'firebase/app';
+import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 import { firebaseConfig } from '../firebaseConfig'; // Adjust the path as necessary
 
-// Ensure Firebase is initialized once
 if (!getApps().length) {
   initializeApp(firebaseConfig);
 }
@@ -43,7 +43,7 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   return (
-    <Stack initialRouteName="index">
+    <Stack>
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="learn" options={{ headerShown: false }} />
       <Stack.Screen name="lesson" options={{ headerShown: false }} />
@@ -52,6 +52,7 @@ function RootLayoutNav() {
       <Stack.Screen name="register" options={{ headerShown: false }} />
       <Stack.Screen name="settings" options={{ headerShown: false }} />
       <Stack.Screen name="FriendsScreen" options={{ headerShown: false }} />
+      <Stack.Screen name="AchievementsScreen" options={{ headerShown: false }} />
     </Stack>
   );
 }
