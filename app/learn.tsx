@@ -22,7 +22,7 @@ const LearnScreen = () => {
   return (
     <View style={styles.container}>
       <TouchableOpacity style={styles.profileButton} onPress={handleProfile}>
-        <FontAwesome name="user" size={24} color="black" />
+        <FontAwesome name="user" size={24} color="purple" />
       </TouchableOpacity>
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.buttonText}>Logout</Text>
@@ -48,11 +48,14 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 40,
     left: 20,
+    color:'#9F69A3',
+
   },
   logoutButton: {
     position: 'absolute',
     top: 40,
     right: 20,
+
   },
   theoryButton: {
     width: 362,

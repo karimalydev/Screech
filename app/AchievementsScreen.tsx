@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -47,6 +47,7 @@ const AchievementsScreen = () => {
         <Text style={styles.lessonNumber}>{highestLesson}</Text>
       </View>
       <Text style={styles.quoteText}>{quote}</Text>
+      <Image source={require('../assets/images/chill.png')} style={styles.bottomImage} resizeMode="contain" />
     </View>
   );
 };
@@ -91,6 +92,11 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     marginTop: 20,
+  },
+  bottomImage: {
+    width: 100,
+    height: 100,
+    marginTop: 30,
   },
 });
 

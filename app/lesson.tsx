@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ScrollView } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, ScrollView, Animated, Modal } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth, db } from '../firebaseConfig';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import ConfettiCannon from 'react-native-confetti-cannon';
+
 
 const lessons = [
   { id: 1, title: 'LESSON 1', color: '#0792A0', explanation: 'Music theory is the study of the practices and possibilities of music.', question: 'What is music theory?', options: ['Study of music symbols and rules', 'Playing an instrument', 'Singing songs'], answer: 'Study of music symbols and rules' },
@@ -44,10 +46,14 @@ const lessons = [
   { id: 36, title: 'LESSON 36', color: '#F7DA31', explanation: 'Analyzing classical pieces involves looking at their structure, harmony, melody, and use of musical elements.', question: 'What is the purpose of analyzing classical pieces?', options: ['To understand their structure', 'To memorize them', 'To play them faster'], answer: 'To understand their structure' },
 ];
 
+
 const LessonScreen = () => {
   const [expandedLesson, setExpandedLesson] = useState<number | null>(null);
   const [completedLessons, setCompletedLessons] = useState<number[]>([1]);
+  const [modalVisible, setModalVisible] = useState(false);
   const router = useRouter();
+  const confettiRef = useRef(null);
+  const errorAnimation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     const loadCompletedLessons = async () => {
@@ -97,79 +103,129 @@ const LessonScreen = () => {
         });
       }
 
+      if (confettiRef.current) {
+        confettiRef.current.start();
+      }
+
       Alert.alert('Correct!', `You have unlocked ${lessons.find((l) => l.id === expandedLesson + 1)?.title}`, [{ text: 'OK', onPress: handleClose }]);
     } else {
+      Animated.sequence([
+        Animated.timing(errorAnimation, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(errorAnimation, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
       Alert.alert('Wrong answer', 'Please try again.');
     }
   };
 
   return (
     <View style={styles.container}>
-    {expandedLesson === null ? (
-      <>
-        <View style={styles.headerButtons}>
-          <TouchableOpacity style={styles.profileButton} onPress={handleProfile}>
-            <Text style={styles.buttonText}>Profile</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.buttonText}>Logout</Text>
-          </TouchableOpacity>
-        </View>
-        <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-          <View style={styles.lessonsContainer}>
-            {lessons
-              .filter((lesson) => completedLessons.includes(lesson.id))
-              .map((lesson) => (
-                <TouchableOpacity
-                  key={lesson.id}
-                  style={[styles.lessonCard, { backgroundColor: lesson.color }]}
-                  onPress={() => handlePress(lesson.id)}
-                >
-                  <Text style={styles.lessonTitle}>{lesson.title}</Text>
-                </TouchableOpacity>
-              ))}
+      {expandedLesson === null ? (
+        <>
+          <View style={styles.headerButtons}>
+            <TouchableOpacity style={styles.profileButton} onPress={handleProfile}>
+              <Text style={styles.buttonText}>Profile</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+              <Text style={styles.buttonText}>Logout</Text>
+            </TouchableOpacity>
           </View>
-         
-        </ScrollView>
-        <View style={styles.fixedCard}>
+          <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+            <View style={styles.lessonsContainer}>
+              {lessons
+                .filter((lesson) => completedLessons.includes(lesson.id))
+                .map((lesson) => (
+                  <TouchableOpacity
+                    key={lesson.id}
+                    style={[styles.lessonCard, { backgroundColor: lesson.color }]}
+                    onPress={() => handlePress(lesson.id)}
+                  >
+                    <Text style={styles.lessonTitle}>{lesson.title}</Text>
+                  </TouchableOpacity>
+                ))}
+            </View>
+          </ScrollView>
+          <TouchableOpacity style={styles.fixedCard} onPress={() => setModalVisible(true)}>
             <Image source={require('../assets/images/homeimage.png')} style={styles.fixedCardImage} />
             <Text style={styles.fixedCardText}>Lesson Progressions</Text>
-          </View>
-      </>
-    ) : (
-      <View style={[styles.lessonCardExpanded, { backgroundColor: lessons.find(lesson => lesson.id === expandedLesson)?.color }]}>
-        <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
-          <Text style={styles.closeButtonText}>X</Text>
-        </TouchableOpacity>
-        {expandedLesson !== null && (
-          <>
-            <Text style={styles.lessonTitle}>
-              {lessons.find((lesson) => lesson.id === expandedLesson)?.title}
-            </Text>
-            <Text style={styles.explanationText}>
-              {lessons.find((lesson) => lesson.id === expandedLesson)?.explanation}
-            </Text>
-            <View style={styles.questionContainer}>
-              <Image source={require('../assets/images/homeimage.png')} style={styles.speechBubbleImage} />
-              <View style={styles.speechBubble}>
-                <Text style={styles.questionText}>
-                  {lessons.find((lesson) => lesson.id === expandedLesson)?.question}
-                </Text>
+          </TouchableOpacity>
+        </>
+      ) : (
+        <View style={[styles.lessonCardExpanded, { backgroundColor: lessons.find(lesson => lesson.id === expandedLesson)?.color }]}>
+          <TouchableOpacity style={styles.closeButton} onPress={handleClose}>
+            <Text style={styles.closeButtonText}>X</Text>
+          </TouchableOpacity>
+          {expandedLesson !== null && (
+            <>
+              <Text style={styles.lessonTitle}>
+                {lessons.find((lesson) => lesson.id === expandedLesson)?.title}
+              </Text>
+              <Text style={styles.explanationText}>
+                {lessons.find((lesson) => lesson.id === expandedLesson)?.explanation}
+              </Text>
+              <View style={styles.questionContainer}>
+                <Image source={require('../assets/images/homeimage.png')} style={styles.speechBubbleImage} />
+                <View style={styles.speechBubble}>
+                  <Text style={styles.questionText}>
+                    {lessons.find((lesson) => lesson.id === expandedLesson)?.question}
+                  </Text>
+                </View>
               </View>
-            </View>
-            <View style={styles.optionsContainer}>
-              {lessons.find((lesson) => lesson.id === expandedLesson)?.options.map((option) => (
-                <TouchableOpacity key={option} style={styles.optionButton} onPress={() => handleAnswer(option)}>
-                  <Text style={styles.optionText}>{option}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </>
-        )}
-      </View>
-    )}
-  </View>
-  
+              <View style={styles.optionsContainer}>
+                {lessons.find((lesson) => lesson.id === expandedLesson)?.options.map((option) => (
+                  <TouchableOpacity key={option} style={styles.optionButton} onPress={() => handleAnswer(option)}>
+                    <Text style={styles.optionText}>{option}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </>
+          )}
+        </View>
+      )}
+      <ConfettiCannon
+        count={200}
+        origin={{ x: -10, y: 0 }}
+        autoStart={false}
+        ref={confettiRef}
+        fadeOut={true}
+      />
+      <Animated.View style={[
+        styles.errorImageContainer,
+        {
+          transform: [{ scale: errorAnimation }],
+          opacity: errorAnimation,
+        }
+      ]}>
+        <Image source={require('../assets/images/depressed.png')} style={styles.errorImage} />
+      </Animated.View>
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Lesson Progression</Text>
+            <Text style={styles.modalText}>Lessons 1-7: These initial lessons introduce fundamental concepts like the musical staff, clefs, note durations, and accidentals. This approach is crucial because it establishes a strong foundation, allowing learners to grasp more complex ideas later.</Text>
+            <Text style={styles.modalText}>Lessons 8-14: These lessons cover major and minor scales, intervals, and chord structures. Understanding scales and intervals is essential as they are the building blocks of melody and harmony in music.</Text>
+            <Text style={styles.modalText}>Lessons 10-20: Introducing chords and their progressions helps students understand harmonic functions and how different chords interact within a key. This knowledge is pivotal for both performance and composition.</Text>
+            <Text style={styles.modalText}>Lessons 21-36: These lessons delve into advanced topics like cadences, modulation, secondary dominants, borrowed chords, and the twelve-tone technique. They also cover musical forms and the analysis of classical pieces. These advanced topics are crucial for a deep understanding of music theory, enabling students to analyze and compose complex music.</Text>
+            <TouchableOpacity style={styles.closeModalButton} onPress={() => setModalVisible(false)}>
+              <Text style={styles.buttonText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 };
 
@@ -285,7 +341,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
     marginBottom: 20,
-    marginLeft: 20,
   },
   fixedCardImage: {
     width: 50,
@@ -315,6 +370,47 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
+  errorImageContainer: {
+    position: 'absolute',
+    top: '10%',
+    left: '50%',
+    transform: [{ translateX: -50 }, { translateY: -50 }],
+    zIndex: 1,
+    width: "45%",
+  },
+  errorImage: {
+    width: 100,
+    height: 100,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    width: '90%',
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 10,
+  },
+  closeModalButton: {
+    backgroundColor: '#0792A0',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
 });
+
 
 export default LessonScreen;

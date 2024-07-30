@@ -96,7 +96,7 @@ const ProfileScreen = () => {
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Text style={styles.buttonText}>Logout</Text>
       </TouchableOpacity>
-      <Image source={require('../assets/images/homeimage.png')} style={styles.profileImage} />
+      <Image source={require('../assets/images/angry.png')} style={styles.profileImage} resizeMode="contain" />
       <Text style={styles.greeting}>HI {username}!</Text>
       <Text style={styles.email}>{email}</Text>
       {isEditingBio ? (
