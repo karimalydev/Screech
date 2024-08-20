@@ -6,7 +6,7 @@ import { initializeApp, getApp, getApps } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-import { firebaseConfig } from '../firebaseConfig'; // Adjust the path as necessary
+import { firebaseConfig } from '../firebaseConfig'; 
 
 if (!getApps().length) {
   initializeApp(firebaseConfig);

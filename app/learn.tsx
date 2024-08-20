@@ -7,7 +7,7 @@ const LearnScreen = () => {
   const router = useRouter();
 
   const handleLogout = () => {
-    // Add your logout functionality here
+    
     router.push('/login');
   };
 

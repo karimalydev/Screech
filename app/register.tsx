@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { auth, db } from '../firebaseConfig';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
-import PasswordChecklist from './PasswordChecklist'; // Ensure the path is correct
+import PasswordChecklist from './PasswordChecklist'; 
 
 const RegisterScreen = () => {
   const router = useRouter();
