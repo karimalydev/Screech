@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+// Array of motivational quotes
 const motivationalQuotes = [
   "Believe you can and you're halfway there.",
   "The only way to do great work is to love what you do.",
@@ -12,8 +12,11 @@ const motivationalQuotes = [
 ];
 
 const AchievementsScreen = () => {
+    // State variables for storing the highest lesson number and the selected motivational quote
+
   const [highestLesson, setHighestLesson] = useState<number>(0);
   const [quote, setQuote] = useState<string>('');
+  // Hook to manage navigation within the app
   const router = useRouter();
 
   useEffect(() => {
@@ -24,6 +27,7 @@ const AchievementsScreen = () => {
         setHighestLesson(Math.max(...lessonsArray));
       }
     };
+        // Function to select a random quote from the motivationalQuotes array
 
     const getRandomQuote = () => {
       const randomIndex = Math.floor(Math.random() * motivationalQuotes.length);
@@ -33,6 +37,7 @@ const AchievementsScreen = () => {
     loadCompletedLessons();
     getRandomQuote();
   }, []);
+  // Function to handle the back button press, navigating to the previous screen
 
   const handleBack = () => {
     router.back();

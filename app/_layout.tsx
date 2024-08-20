@@ -1,3 +1,4 @@
+// Importing necessary modules from 'expo-router', 'expo-font', and 'react'.
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { SplashScreen, Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
@@ -8,14 +9,16 @@ import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { firebaseConfig } from '../firebaseConfig'; 
 
+// Initialize Firebase app only if it hasn't been initialized yet.
 if (!getApps().length) {
   initializeApp(firebaseConfig);
 }
 
+// Setting initial route for the app's navigation.
 export const unstable_settings = {
   initialRouteName: 'index',
 };
-
+// Prevent the splash screen from auto-hiding before the app is ready.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -23,7 +26,7 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });
-
+// Effect hook to handle font loading errors.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -37,7 +40,7 @@ export default function RootLayout() {
   if (!loaded) {
     return null;
   }
-
+// Render the RootLayoutNav component when everything is ready.
   return <RootLayoutNav />;
 }
 

@@ -4,6 +4,8 @@ import { collection, query, where, onSnapshot, addDoc, deleteDoc, doc, updateDoc
 import { auth, db } from '../firebaseConfig';
 import { router } from 'expo-router';
 
+// Interfaces to define the shape of FriendRequest and Friend objects
+
 interface FriendRequest {
   id: string;
   fromUserId: string;
@@ -19,16 +21,21 @@ interface Friend {
   profilePicture: string;
   highestLesson: number;
 }
+// Main component for the FriendsScreen
 
 const FriendsScreen = () => {
   const [tab, setTab] = useState<'friends' | 'add'>('friends');
   const [requests, setRequests] = useState<FriendRequest[]>([]);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [username, setUsername] = useState('');
+    // Hook to manage navigation within the app
+
 
   useEffect(() => {
     const user = auth.currentUser;
     if (user) {
+            // Query to fetch friend requests sent to the current user with status 'pending'
+
       const q = query(collection(db, 'friendRequests'), where('toUserId', '==', user.uid), where('status', '==', 'pending'));
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         const requestsData: FriendRequest[] = [];
@@ -40,6 +47,8 @@ const FriendsScreen = () => {
       return () => unsubscribe();
     }
   }, []);
+
+    // useEffect to fetch friends list and their profiles whenever friend requests change
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -71,6 +80,7 @@ const FriendsScreen = () => {
 
     fetchFriends();
   }, [requests]);
+  // Function to handle adding a new friend
 
   const handleAddFriend = async () => {
     const user = auth.currentUser;
@@ -80,6 +90,8 @@ const FriendsScreen = () => {
       if (!snapshot.empty) {
         const userData = snapshot.docs[0].data();
         const toUserId = snapshot.docs[0].id;
+                // Create a friend request in the database
+
         await addDoc(collection(db, 'friendRequests'), {
           fromUserId: user.uid,
           toUserId: toUserId,
@@ -102,6 +114,7 @@ const FriendsScreen = () => {
       Alert.alert('Friend request accepted');
     }
   };
+  // Function to handle declining a friend request
 
   const handleDeclineRequest = async (id: string) => {
     await deleteDoc(doc(db, 'friendRequests', id));

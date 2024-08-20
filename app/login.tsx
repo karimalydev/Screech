@@ -6,16 +6,18 @@ import { useRouter } from 'expo-router';
 
 const LoginScreen = () => {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');// State to manage the email input
+  const [password, setPassword] = useState('');// State to manage the password input
+
+    // Function to handle login using Firebase authentication
 
   const handleLogin = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then(() => {
-        router.push('/learn');
+        router.push('/learn');// Navigate to the 'learn' screen on successful login
       })
       .catch((error) => {
-        Alert.alert('Login error', error.message);
+        Alert.alert('Login error', error.message);// Show an alert if there's an error during login
       });
   };
 

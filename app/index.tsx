@@ -5,9 +5,13 @@ import { Audio } from 'expo-av';
 
 const IndexScreen = () => {
   const router = useRouter();
+  // Animated values for rotation and scaling of the logo
   const rotation = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(1)).current;
+    // Reference to the sound object
+
   const soundRef = useRef<Audio.Sound | null>(null);
+  // Function to handle the press event
 
   const handlePress = async () => {
     router.push('/login');
@@ -16,6 +20,7 @@ const IndexScreen = () => {
       await soundRef.current.replayAsync();
     }
   };
+  // useEffect to load the sound and start the animations when the component mounts
 
   useEffect(() => {
     const loadSound = async () => {
@@ -31,6 +36,7 @@ const IndexScreen = () => {
     };
 
     loadSound();
+    // Sequence of animations for rotating and scaling the logo
 
     Animated.sequence([
       Animated.timing(rotation, {
@@ -52,6 +58,7 @@ const IndexScreen = () => {
         useNativeDriver: true,
       }),
     ]).start();
+    // Cleanup function to unload the sound when the component unmounts
 
     return () => {
       if (soundRef.current) {

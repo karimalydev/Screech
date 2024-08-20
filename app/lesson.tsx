@@ -6,6 +6,7 @@ import { auth, db } from '../firebaseConfig';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import ConfettiCannon from 'react-native-confetti-cannon';
 
+// Lessons data array containing details about each lesson
 
 const lessons = [
   { id: 1, title: 'LESSON 1', color: '#0792A0', explanation: 'Music theory is the study of the practices and possibilities of music.', question: 'What is music theory?', options: ['Study of music symbols and rules', 'Playing an instrument', 'Singing songs'], answer: 'Study of music symbols and rules' },
@@ -54,6 +55,7 @@ const LessonScreen = () => {
   const router = useRouter();
   const confettiRef = useRef(null);
   const errorAnimation = useRef(new Animated.Value(0)).current;
+  // Effect to load completed lessons from Firestore when the component mounts
 
   useEffect(() => {
     const loadCompletedLessons = async () => {
@@ -69,6 +71,7 @@ const LessonScreen = () => {
     };
     loadCompletedLessons();
   }, []);
+  // Function to handle lesson card press
 
   const handlePress = (lessonId: number) => {
     setExpandedLesson(lessonId);
@@ -85,6 +88,7 @@ const LessonScreen = () => {
   const handleProfile = () => {
     router.push('/profile');
   };
+  // Function to handle answer selection
 
   const handleAnswer = async (selectedOption: string) => {
     const lesson = lessons.find((lesson) => lesson.id === expandedLesson);
@@ -102,6 +106,7 @@ const LessonScreen = () => {
           highestLesson: Math.max(...newCompletedLessons),
         });
       }
+      // Trigger the confetti animation
 
       if (confettiRef.current) {
         confettiRef.current.start();
